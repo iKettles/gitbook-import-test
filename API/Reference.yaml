@@ -1,0 +1,318 @@
+openapi: 3.0.3
+info:
+  title: Monopoly SDK REST API
+  version: 1.0.0
+  description: |
+    This REST API powers the Monopoly SaaS backend used by the SDK. All endpoints are **JSON over HTTPS** and
+    secured by **JWT Bearer tokens** obtained via the `/auth/token` flow. Some administrative endpoints additionally
+    accept an **X-API-KEY** header. Unless noted otherwise, every request **MUST** include `Authorization: Bearer <jwt>`.
+  contact:
+    name: Monopoly DevRel
+    email: devrel@monopoly.io
+    url: https://docs.monopoly.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.monopoly.io/v1
+    description: Production
+  - url: https://sandbox.monopoly.io/v1
+    description: Sandbox / testing
+security:
+  - BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT issued by the `/auth/token` endpoint (lifetime ≤ 30 min). Refresh with `/auth/refresh`.
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+      description: Optional for elevated admin operations.
+  parameters:
+    sessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: Unique identifier of the game session (ULID)
+      schema:
+        type: string
+        pattern: "^[0-9A-HJKMNP-TV-Z]{26}$"
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ERR_INVALID_SECRET
+        message:
+          type: string
+          example: Secret token is invalid or expired
+      required: [code, message]
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 1800
+        refresh_token:
+          type: string
+      required: [access_token, token_type, expires_in]
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, active, ended]
+        createdAt:
+          type: string
+          format: date-time
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/Player"
+      required: [id, status, createdAt, players]
+    TurnResult:
+      type: object
+      properties:
+        revision:
+          type: integer
+        dice:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 6
+        playerId:
+          type: string
+        newPosition:
+          type: integer
+        events:
+          type: array
+          items:
+            type: string
+      required: [revision, dice, playerId, newPosition]
+paths:
+  /auth/token:
+    post:
+      tags: [Authentication]
+      summary: Exchange secret for JWT access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tenantId:
+                  type: string
+                secret:
+                  type: string
+              required: [tenantId, secret]
+      responses:
+        "200":
+          description: Token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security: []
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh an expired/expiring JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required: [refresh_token]
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /sessions:
+    get:
+      tags: [Sessions]
+      summary: List sessions for the authenticated tenant
+      responses:
+        "200":
+          description: Array of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+    post:
+      tags: [Sessions]
+      summary: Create a new game session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                players:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Player"
+                  minItems: 2
+                  maxItems: 8
+                boardTheme:
+                  type: string
+                  default: classic
+                locale:
+                  type: string
+                currency:
+                  type: string
+                  default: USD
+              required: [players]
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+  /sessions/{sessionId}:
+    parameters:
+      - $ref: "#/components/parameters/sessionId"
+    get:
+      tags: [Sessions]
+      summary: Get session details
+      responses:
+        "200":
+          description: The requested session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags: [Sessions]
+      summary: Delete a session (must be ended)
+      responses:
+        "204":
+          description: Deleted successfully
+  /sessions/{sessionId}/start:
+    post:
+      tags: [Sessions]
+      summary: Transition a pending session to active status
+      parameters:
+        - $ref: "#/components/parameters/sessionId"
+      responses:
+        "202":
+          description: Session started
+  /sessions/{sessionId}/turns:
+    post:
+      tags: [Turns]
+      summary: Submit a dice roll for the current player
+      parameters:
+        - $ref: "#/components/parameters/sessionId"
+      responses:
+        "200":
+          description: Result of the turn
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TurnResult"
+        "409":
+          description: Not this player's turn or invalid state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /sessions/{sessionId}/state:
+    get:
+      tags: [Sessions]
+      summary: Get current state snapshot
+      parameters:
+        - $ref: "#/components/parameters/sessionId"
+      responses:
+        "200":
+          description: Session snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Opaque snapshot blob understood by SDK resumeSession()
+  /themes:
+    get:
+      tags: [Metadata]
+      summary: List available board themes
+      responses:
+        "200":
+          description: List of themes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    previewUrl:
+                      type: string
+  /ai/strategies:
+    get:
+      tags: [AI]
+      summary: Fetch metadata about available AI strategies
+      responses:
+        "200":
+          description: Array of strategies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    description:
+                      type: string
+                    difficulty:
+                      type: string
+                      enum: [easy, medium, hard]
