@@ -1,7 +1,6 @@
 # Table of contents
 
-* [API](README.md)
-  * [Introduction to the Monopoly SDK REST API](API/Introduction.md)
+* [API](API/Introduction.md)
   * ```yaml
     type: builtin:openapi
     props:
