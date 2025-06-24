@@ -13,8 +13,8 @@
           spec: api-reference
     ```
 * [Guides](guides/README.md)
-  * [Monopoly SDK Contribution Guide](Guides/Contribution.md)
-  * [Monopoly SDK Installation & Integration Guide](<Guides/Getting Started.md>)
+  * [Installation & Integration Guide](<Guides/Getting Started.md>)
+  * [Contribution Guide](Guides/Contribution.md)
 * [SDK](sdk/README.md)
-  * [Monopoly SDK Architecture Overview](SDK/Architecture.md)
-  * [Monopoly SDK Roadmap](SDK/Roadmap.md)
+  * [Architecture Overview](SDK/Architecture.md)
+  * [Roadmap](SDK/Roadmap.md)
