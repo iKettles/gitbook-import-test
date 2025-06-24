@@ -1,3 +1,10 @@
 #!/bin/bash
 
-gitbook openapi publish --spec api-reference --organization ZrTXD6mZwxMx7NOx2Y6Y ./API/api-reference.yaml
+gitbook openapi publish --spec monopoly-api-reference --organization ZrTXD6mZwxMx7NOx2Y6Y ./API/api-reference.yaml
+
+# Create internal API reference (strip all x-internal extensions to reveal internal API)
+yq eval 'del(.. | .["x-internal"]?)' ./API/api-reference.yaml > ./API/internal-api-reference.yaml
+
+gitbook openapi publish --spec monopoly-internal-api-reference --organization ZrTXD6mZwxMx7NOx2Y6Y ./API/internal-api-reference.yaml
+
+rm ./API/internal-api-reference.yaml

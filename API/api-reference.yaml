@@ -298,7 +298,8 @@ paths:
   /ai/strategies:
     get:
       tags: [AI]
-      summary: Fetch metadata about available AI strategies
+      x-internal: true
+      summary: Fetch metadata about available AI strategies (internal use only)
       responses:
         "200":
           description: Array of strategies
