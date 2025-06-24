@@ -3,14 +3,14 @@
 * [Introduction](README.md)
 * [API](API/README.md)
   * ```yaml
+    type: builtin:openapi
     props:
       models: true
-    type: builtin:openapi
     dependencies:
       spec:
         ref:
           kind: openapi
-          spec: api-reference
+          spec: monopoly-api-reference
     ```
 * [Guides](guides/README.md)
   * [Installation & Integration Guide](<Guides/Getting Started.md>)
