@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [API](introduction-1/README.md)
+* [API](API/README.md)
   * ```yaml
     props:
       models: true
