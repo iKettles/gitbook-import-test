@@ -23,8 +23,8 @@ security:
 tags:
   - name: Authentication
   - name: Sessions
-  - name: Turns
   - name: Metadata
+  - name: Turns
   - name: AI
 components:
   securitySchemes:
