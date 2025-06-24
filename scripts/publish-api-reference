@@ -1,0 +1,3 @@
+#!/bin/bash
+
+gitbook openapi publish --spec api-reference --organization ZrTXD6mZwxMx7NOx2Y6Y ./API/api-reference.yaml
