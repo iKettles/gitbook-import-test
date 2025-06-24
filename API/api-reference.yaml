@@ -20,6 +20,12 @@ servers:
     description: Sandbox / testing
 security:
   - BearerAuth: []
+tags:
+  - name: Authentication
+  - name: Sessions
+  - name: Turns
+  - name: Metadata
+  - name: AI
 components:
   securitySchemes:
     BearerAuth:
