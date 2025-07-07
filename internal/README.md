@@ -12,6 +12,13 @@ Use this section if you're:
 * Deploying SDK microservices in self-hosted environments
 * Writing internal analytics or moderation tooling
 
+
+
+| A1 | B1 | B1 |
+| -- | -- | -- |
+| A2 | B2 | C2 |
+| A3 | B3 | C3 |
+
 ***
 
 ## Access Requirements
