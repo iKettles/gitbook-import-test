@@ -3,9 +3,9 @@
 * [Introduction](README.md)
 * [API](API/README.md)
   * ```yaml
-    type: builtin:openapi
     props:
       models: true
+    type: builtin:openapi
     dependencies:
       spec:
         ref:
@@ -18,3 +18,4 @@
 * [SDK](sdk/README.md)
   * [Architecture Overview](SDK/Architecture.md)
   * [Roadmap](SDK/Roadmap.md)
+* [Beta APIs](beta-apis.md)
