@@ -102,7 +102,3 @@ Monopoly SDK is licensed under [MIT](https://opensource.org/licenses/MIT), but t
 * ✉️ Email us: [support@monopoly.io](mailto:support@monopoly.io)
 
 Happy building! 🎲
-
-
-
-{% embed url="https://www.figma.com/design/XsUnnEnxMHWIif3jR3Ynr7/Similarweb-assets?node-id=601-21&t=0w3dKpSO7IGGaAn8-0" %}
